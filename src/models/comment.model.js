@@ -1,19 +1,24 @@
 import { Schema, model } from "mongoose";
 
-const commentSchema = new Schema({
-  content: {
-    String,
-    minlength: 5,
-    maxlength: 500,
+const commentSchema = new Schema(
+  {
+    content: {
+      String,
+      minlength: 5,
+      maxlength: 500,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    article: {
+      type: Schema.Types.ObjectId,
+      ref: "Article",
+    },
   },
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
-  article: {
-    type: Schema.Types.ObjectId,
-    ref: "Article",
-  },
-});
+  {
+    versionKey: false,
+  }
+);
 
 export const CommentModel = model("Comment", commentSchema);

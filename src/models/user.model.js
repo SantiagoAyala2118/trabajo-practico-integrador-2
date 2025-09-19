@@ -1,54 +1,59 @@
 import { match } from "assert";
 import { Schema, model } from "mongoose";
 
-const userSchema = new Schema({
-  username: {
-    String,
-    unique: true,
-    required: true,
-    minlength: 3,
-    maxlength: 20,
-  },
-  email: {
-    String,
-    unique: true,
-    match: /.+\@.+\..+/,
-  },
-  password: {
-    String,
-    required: true,
-  },
-  role: {
-    String,
-    enum: ["user", "admin"],
-    default: "user",
-  },
-  profile: {
-    firstName: {
-      String,
-      minlength: 2,
-      maxlength: 50,
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      unique: true,
+      required: true,
+      minlength: 3,
+      maxlength: 20,
     },
-    lastName: {
-      String,
-      minlength: 2,
-      maxlength: 50,
+    email: {
+      type: String,
+      unique: true,
+      match: /.+\@.+\..+/,
     },
-    biography: {
-      String,
-      maxlength: 500,
-      required: false,
+    password: {
+      type: String,
+      required: true,
     },
-    avatarUrl: {
-      String,
-      required: false,
-      match: /^(https?|ftp):\/\/[^\s"]+$/i,
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
     },
-    birthDate: {
-      Date,
-      required: false,
+    profile: {
+      firstName: {
+        type: String,
+        minlength: 2,
+        maxlength: 50,
+      },
+      lastName: {
+        type: String,
+        minlength: 2,
+        maxlength: 50,
+      },
+      biography: {
+        type: String,
+        maxlength: 500,
+        required: false,
+      },
+      avatarUrl: {
+        type: String,
+        required: false,
+        match: /^(https?|ftp):\/\/[^\s"]+$/i,
+      },
+      birthDate: {
+        type: Date,
+        required: false,
+      },
     },
   },
-});
+  {
+    versionKey: false,
+  }
+);
 
 export const UserModel = model("User", userSchema);
