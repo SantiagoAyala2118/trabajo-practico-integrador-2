@@ -4,6 +4,10 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
+//BASE DE DATOS
+import { startDB } from "./src/config/database.js";
+startDB();
+
 const app = express();
 const PORT = process.env.PORT;
 
