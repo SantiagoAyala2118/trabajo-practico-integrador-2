@@ -49,6 +49,10 @@ const userSchema = new Schema(
         required: false,
       },
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     versionKey: false,
