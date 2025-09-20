@@ -1,19 +1,21 @@
 import { UserModel } from "../models/user.model.js";
 import { generateToken } from "../helpers/jwt.helper.js";
 import { hashPassword, comparePassword } from "../helpers/bcrypt.helper.js";
+import { matchedData } from "express-validator";
 
 //REGISTRAR USUARIO
 export const register = async (req, res) => {
-  const { username, email, password, role, profile } = req.body;
   try {
-    const hashedPassword = await hashPassword(password);
+    const validatedData = matchedData(req);
+
+    const hashedPassword = await hashPassword(validatedData.password);
 
     const user = await UserModel.create({
-      username,
-      email,
+      username: validatedData.username,
+      email: validatedData.email,
       password: hashedPassword,
-      role,
-      profile,
+      role: validatedData.role,
+      profile: validatedData.profile,
     });
 
     if (user) {
