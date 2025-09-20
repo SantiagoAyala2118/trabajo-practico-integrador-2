@@ -35,6 +35,16 @@ const articleSchema = new Schema(
   }
 );
 
+//PARA LA ELIMINACIÓN EN CASCADA
+articleSchema.post("findByIdAndDelete", async (doc) => {
+  if (!doc) return;
+
+  const CommentModel = model("Comment");
+
+  await CommentModel.deleteMany({ article: doc._id });
+});
+
+//PARA LOS POPULATES INVERSOS
 articleSchema.virtual("comments", {
   ref: "Comment",
   localField: "_id",

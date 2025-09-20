@@ -20,6 +20,19 @@ const tagSchema = new Schema(
   }
 );
 
+//PARA LA ELIMINACIÓN EN CASCADA
+tagSchema.post("findByIdAndDelete", async (doc) => {
+  if (!doc) return;
+
+  const ArticleModel = model("Article");
+
+  await ArticleModel.updateMany(
+    { tags: doc._id },
+    { $pull: { tags: doc._id } }
+  );
+});
+
+//PARA LOS POPULATES INVERSOS
 tagSchema.virtual("articles", {
   ref: "Article",
   localField: "_id",
