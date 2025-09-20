@@ -3,21 +3,21 @@ import { Schema, model } from "mongoose";
 const articleSchema = new Schema(
   {
     title: {
-      String,
+      type: String,
       minlength: 3,
-      maclength: 200,
+      maxlength: 200,
     },
     content: {
-      String,
+      type: String,
       minlength: 50,
     },
     excerpt: {
-      String,
+      type: String,
       maxlength: 500,
       required: false,
     },
     status: {
-      String,
+      type: String,
       enum: ["published", "archived"],
       default: "published",
     },
@@ -34,5 +34,14 @@ const articleSchema = new Schema(
     versionKey: false,
   }
 );
+
+articleSchema.virtual("comments", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "article",
+  justOne: false,
+});
+
+articleSchema.set("toJSON", { virtuals: true });
 
 export const ArticleModel = model("Article", articleSchema);

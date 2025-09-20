@@ -1,4 +1,3 @@
-import { match } from "assert";
 import { Schema, model } from "mongoose";
 
 const userSchema = new Schema(
@@ -55,5 +54,15 @@ const userSchema = new Schema(
     versionKey: false,
   }
 );
+
+//PARA HACER POPULATES INVERSOS
+userSchema.virtual("articles", {
+  ref: "Article",
+  localField: "_id",
+  foreignField: "author",
+  justOne: false,
+});
+
+userSchema.set("toJSON", { virtuals: true });
 
 export const UserModel = model("User", userSchema);
