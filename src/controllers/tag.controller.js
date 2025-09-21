@@ -1,9 +1,11 @@
+import { matchedData } from "express-validator";
 import { TagModel } from "../models/tag.model.js";
 
 export const createTag = async (req, res) => {
-  const { name, description } = req.body;
   try {
-    const tag = await TagModel.create({ name, description });
+    const validatedData = matchedData(req);
+
+    const tag = await TagModel.create(validatedData);
 
     return res.status(201).json({
       ok: true,
@@ -22,6 +24,13 @@ export const createTag = async (req, res) => {
 export const getAllTags = async (req, res) => {
   try {
     const tags = await TagModel.find();
+
+    if (tags.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        message: "Tags not founded",
+      });
+    }
 
     return res.status(200).json({
       ok: true,
@@ -62,9 +71,18 @@ export const getTag = async (req, res) => {
 export const updateTag = async (req, res) => {
   const { id } = req.params;
   try {
+    const validatedData = matchedData(req, { locations: ["body"] });
+
+    if (Object.keys(validatedData) == 0) {
+      return res.status(400).json({
+        ok: false,
+        message: "Nothing to update",
+      });
+    }
+
     const updateTag = await TagModel.findByIdAndUpdate(
       id,
-      { $set: req.body },
+      { $set: validatedData },
       { new: true }
     );
 
