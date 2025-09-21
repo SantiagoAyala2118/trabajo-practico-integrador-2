@@ -25,7 +25,7 @@ export const addTagToArticleValidations = [
     .withMessage("The id must be an alphanumeric with 24 characters")
     .custom(async (tagId) => {
       try {
-        const tag = await TagModel.finById(tagId);
+        const tag = await TagModel.findById(tagId);
 
         if (!tag) {
           return Promise.reject("Tag not founded");
@@ -60,7 +60,7 @@ export const removeTagFromArticleValidations = [
     .withMessage("The id must be an alphanumeric with 24 characters")
     .custom(async (tagId) => {
       try {
-        const tag = await TagModel.finById(tagId);
+        const tag = await TagModel.findById(tagId);
 
         if (!tag) {
           return Promise.reject("Tag not founded");
