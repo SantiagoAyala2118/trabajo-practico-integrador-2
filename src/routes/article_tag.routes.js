@@ -16,6 +16,12 @@ import {
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { articleOwnerAdminMiddleware } from "../middlewares/articleOwnerOrAdmin.js";
 
+import {
+  addTagToArticleValidations,
+  removeTagFromArticleValidations,
+} from "../middlewares/validations/article_tag.validations.js";
+import { applyValidations } from "../middlewares/validator.js";
+
 const articleTagRoutes = Router();
 
 //ENDPOINTS
@@ -23,6 +29,8 @@ articleTagRoutes.post(
   "/articles/:articleId/tags/:tagId",
   authMiddleware,
   articleOwnerAdminMiddleware,
+  addTagToArticleValidations,
+  applyValidations,
   addTagToArticle
 );
 
@@ -30,6 +38,8 @@ articleTagRoutes.delete(
   "/articles/:articleId/tags/:tagId",
   authMiddleware,
   articleOwnerAdminMiddleware,
+  removeTagFromArticleValidations,
+  applyValidations,
   removeTagFromArticle
 );
 
