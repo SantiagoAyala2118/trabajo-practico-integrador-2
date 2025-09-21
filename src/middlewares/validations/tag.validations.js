@@ -14,7 +14,7 @@ export const createTagValidations = [
     .withMessage("Name must not contain spaces")
     .custom(async (name) => {
       try {
-        const nameExisting = await TagModel.findOne(name);
+        const nameExisting = await TagModel.findOne({ name: name });
 
         if (nameExisting) {
           return Promise.reject("A tag with that name already exists");
