@@ -1,17 +1,17 @@
+import { matchedData } from "express-validator";
 import { CommentModel } from "../models/comment.model.js";
 
 export const createComment = async (req, res) => {
-  const { content, author, article } = req.body;
   try {
-    const newComment = await CommentModel.create({ content, author, article });
+    const validatedData = matchedData(req);
 
-    if (newComment) {
-      return res.status(201).json({
-        ok: true,
-        message: "Comment created",
-        comment: newComment,
-      });
-    }
+    const newComment = await CommentModel.create(validatedData);
+
+    return res.status(201).json({
+      ok: true,
+      message: "Comment created",
+      comment: newComment,
+    });
   } catch (err) {
     console.error("Server error", err);
     return res.status(500).json({
@@ -65,12 +65,20 @@ export const getUserLoggedComments = async (req, res) => {
 };
 
 export const updateComment = async (req, res) => {
-  const { id } = req.params;
   try {
+    const validatedData = matchedData(req, { locations: ["body"] });
+
+    if (Object.keys(validatedData) == 0) {
+      return res.status(400).json({
+        ok: false,
+        message: "Nothing to update",
+      });
+    }
+
     const updatedComment = await CommentModel.findByIdAndUpdate(
       id,
       {
-        $set: req.body,
+        $set: validatedData,
       },
       { new: true }
     );
