@@ -1,16 +1,11 @@
+import { matchedData } from "express-validator";
 import { ArticleModel } from "../models/article.model.js";
 
 export const createArticle = async (req, res) => {
-  const { title, content, excerpt, status, author, tags } = req.body;
   try {
-    const article = await ArticleModel.create({
-      title,
-      content,
-      excerpt,
-      status,
-      author,
-      tags,
-    });
+    const validatedData = matchedData(req);
+
+    const article = await ArticleModel.create(validatedData);
 
     if (article) {
       return res.status(201).json({
@@ -33,6 +28,13 @@ export const getAllArticles = async (req, res) => {
     const articles = await ArticleModel.find()
       .populate("author", " username email role") //populate para traer ek autot
       .populate("tags", " name description"); //populate para traer los tags
+
+    if (articles.length == 0) {
+      return res.status(404).json({
+        ok: false,
+        message: "Articles not founded",
+      });
+    }
 
     return res.status(200).json({
       ok: true,
@@ -96,19 +98,26 @@ export const getUserLoggedArticles = async (req, res) => {
 export const updateArticle = async (req, res) => {
   const { id } = req.params;
   try {
+    const validatedData = matchedData(req, { locations: ["body"] });
+
+    if (Object.keys(validatedData) == 0) {
+      return res.status(400).json({
+        ok: false,
+        message: "Nothing to update",
+      });
+    }
+
     const updatedArticle = await ArticleModel.findByIdAndUpdate(
       id,
-      { $set: req.body },
+      { $set: validatedData },
       { new: true }
     );
 
-    if (updateArticle) {
-      return res.status(200).json({
-        ok: true,
-        message: "Article updated",
-        Article: updatedArticle,
-      });
-    }
+    return res.status(200).json({
+      ok: true,
+      message: "Article updated",
+      Article: updatedArticle,
+    });
   } catch (err) {
     console.error("Server error", err);
     return res.status(500).json({
@@ -120,16 +129,14 @@ export const updateArticle = async (req, res) => {
 export const deleteArticle = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedArticle = await ArticleModel.findByIdAndDelete(id, {
+    await ArticleModel.findByIdAndDelete(id, {
       new: true,
     });
 
-    if (deletedArticle) {
-      return res.status(200).json({
-        ok: true,
-        message: "Article deleted",
-      });
-    }
+    return res.status(200).json({
+      ok: true,
+      message: "Article deleted",
+    });
   } catch (err) {
     console.error("Server error", err);
     return res.status(500).json({
