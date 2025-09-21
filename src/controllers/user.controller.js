@@ -1,6 +1,7 @@
 import { UserModel } from "../models/user.model.js";
 import { ArticleModel } from "../models/article.model.js";
 import { CommentModel } from "../models/comment.model.js";
+import { matchedData } from "express-validator";
 
 export const getAllUsersWithArticles = async (req, res) => {
   try {
@@ -9,13 +10,18 @@ export const getAllUsersWithArticles = async (req, res) => {
       select: "title status _id",
     });
 
-    if (users) {
-      return res.status(200).json({
-        ok: true,
-        message: "Users founded",
-        users: users,
+    if (!users) {
+      return res.status(404).json({
+        ok: false,
+        message: "No users founded",
       });
     }
+
+    return res.status(200).json({
+      ok: true,
+      message: "Users founded",
+      users: users,
+    });
   } catch (err) {
     console.error("Server error", err);
     return res.status(500).json({
@@ -56,9 +62,18 @@ export const getUserWithArticlesAndComments = async (req, res) => {
 export const updateUser = async (req, res) => {
   const { id } = req.params;
   try {
+    const validatedData = matchedData(req, { locations: ["body"] });
+
+    if (Object.keys(validatedData) == 0) {
+      return res.status(400).json({
+        ok: false,
+        message: "Nothing to update",
+      });
+    }
+
     const updateUser = await UserModel.findByIdAndUpdate(
       id,
-      { $set: req.body },
+      { $set: validatedData },
       { new: true }
     );
 
