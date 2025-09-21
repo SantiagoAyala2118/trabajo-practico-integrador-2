@@ -42,7 +42,7 @@ export const getTagValidations = [
     .withMessage("The id must be an alphanumeric with 24 characters")
     .custom(async (id) => {
       try {
-        const tag = await TagModel.finById(id);
+        const tag = await TagModel.findById(id);
 
         if (!tag) {
           return Promise.reject("Tag not founded");
