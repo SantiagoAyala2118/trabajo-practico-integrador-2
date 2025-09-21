@@ -122,11 +122,20 @@ export const getAuthProfile = async (req, res) => {
 //ACTUALIZAR EL PERFIL DEL USUARIO AUTENTICADO
 export const updateAuthProfile = async (req, res) => {
   try {
+    const validatedData = matchedData(req, { locations: ["body"] });
+
+    if (Object.keys(validatedData) == 0) {
+      return res.status(400).json({
+        ok: false,
+        message: "Nothing to update",
+      });
+    }
+
     const userLogged = req.userLogged;
 
     const updatedProfile = await UserModel.findByIdAndUpdate(
       userLogged.id,
-      { $set: { profile: req.body.profile } },
+      { $set: { profile: validatedData } },
       { new: true }
     );
 
