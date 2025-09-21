@@ -66,8 +66,6 @@ export const createArticleValidations = [
     .trim()
     .notEmpty()
     .withMessage("Tagss cannot be empty")
-    .isString()
-    .withMessage("Tag must be a string")
     .isArray({ min: 1 })
     .withMessage("Tags must be an array with at least one element")
     .custom(async (tags) => {
