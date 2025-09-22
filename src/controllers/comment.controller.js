@@ -65,6 +65,7 @@ export const getUserLoggedComments = async (req, res) => {
 };
 
 export const updateComment = async (req, res) => {
+  const { id } = req.params;
   try {
     const validatedData = matchedData(req, { locations: ["body"] });
 
