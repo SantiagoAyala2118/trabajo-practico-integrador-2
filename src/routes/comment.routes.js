@@ -45,8 +45,8 @@ commentRoutes.get("/comments/my", authMiddleware, getUserLoggedComments);
 commentRoutes.put(
   "/comments/:id",
   authMiddleware,
-  commentOwnerAdminMiddleware,
   updateCommentValidations,
+  commentOwnerAdminMiddleware,
   applyValidations,
   updateComment
 );

@@ -49,8 +49,8 @@ articleRoutes.get(
 articleRoutes.put(
   "/articles/:id",
   authMiddleware,
-  articleOwnerAdminMiddleware,
   updateArticleValidations,
+  articleOwnerAdminMiddleware,
   applyValidations,
   updateArticle
 );
