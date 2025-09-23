@@ -105,29 +105,6 @@ export const updateCommentValidations = [
     .withMessage(
       "Content must have at least 5 characters and a maximum of 500"
     ),
-  body("author")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Author cannot be empty")
-    .isString()
-    .withMessage("Author must be a string")
-    .isLength({ min: 1, max: 24 })
-    .withMessage("Author must be an alphanumeric of 24 characters")
-    .custom(async (author) => {
-      try {
-        const authorExisting = await UserModel.findOne({
-          $and: [{ _id: author }, { deletedAt: null }],
-        });
-
-        if (!authorExisting) {
-          return Promise.reject("Author not founded");
-        }
-      } catch (err) {
-        console.error("Error checking the existency of the author", err);
-        return Promise.reject("Error checking the existency of the author");
-      }
-    }),
   body("article")
     .optional()
     .trim()

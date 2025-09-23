@@ -3,9 +3,15 @@ import { CommentModel } from "../models/comment.model.js";
 
 export const createComment = async (req, res) => {
   try {
+    const userLogged = req.userLogged;
+
     const validatedData = matchedData(req);
 
-    const newComment = await CommentModel.create(validatedData);
+    const newComment = await CommentModel.create({
+      content: validatedData.content,
+      author: userLogged.id,
+      article: validatedData.article,
+    });
 
     return res.status(201).json({
       ok: true,
@@ -69,7 +75,7 @@ export const updateComment = async (req, res) => {
   try {
     const validatedData = matchedData(req, { locations: ["body"] });
 
-    if (Object.keys(validatedData) == 0) {
+    if (Object.keys(validatedData).length === 0) {
       return res.status(400).json({
         ok: false,
         message: "Nothing to update",
