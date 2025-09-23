@@ -3,9 +3,18 @@ import { ArticleModel } from "../models/article.model.js";
 
 export const createArticle = async (req, res) => {
   try {
+    const userLogged = req.userLogged;
+
     const validatedData = matchedData(req);
 
-    const article = await ArticleModel.create(validatedData);
+    const article = await ArticleModel.create({
+      title: validatedData.title,
+      content: validatedData.content,
+      excerpt: validatedData.excerpt,
+      status: validatedData.status,
+      author: userLogged.id,
+      tags: validatedData.tags,
+    });
 
     if (article) {
       return res.status(201).json({
@@ -100,7 +109,7 @@ export const updateArticle = async (req, res) => {
   try {
     const validatedData = matchedData(req, { locations: ["body"] });
 
-    if (Object.keys(validatedData) == 0) {
+    if (Object.keys(validatedData).length === 0) {
       return res.status(400).json({
         ok: false,
         message: "Nothing to update",
