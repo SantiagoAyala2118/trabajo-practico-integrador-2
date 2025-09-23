@@ -124,14 +124,14 @@ export const updateAuthProfileValidations = [
     .withMessage(
       "LastName must have at least 2 characters and a maximum of 50"
     ),
-  body("biography")
+  body("profile.biography")
     .optional()
     .trim()
     .notEmpty()
     .withMessage("Biography cannot be empty")
     .isString()
     .withMessage("Biography must be a string"),
-  body("avatarUrl")
+  body("profile.avatarUrl")
     .optional()
     .trim()
     .notEmpty()
@@ -140,7 +140,7 @@ export const updateAuthProfileValidations = [
     .withMessage("AvatarUrl must be a string")
     .matches(/^(https?|ftp):\/\/[^\s"]+$/i)
     .withMessage("AvatarUrl format invalid"),
-  body("birthDate")
+  body("profile.birthDate")
     .optional()
     .trim()
     .notEmpty()
