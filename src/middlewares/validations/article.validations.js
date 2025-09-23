@@ -1,6 +1,5 @@
 import { body, param } from "express-validator";
 import { ArticleModel } from "../../models/article.model.js";
-import { UserModel } from "../../models/user.model.js";
 import { TagModel } from "../../models/tag.model.js";
 
 export const createArticleValidations = [
@@ -40,28 +39,6 @@ export const createArticleValidations = [
     .withMessage("Status must be a string")
     .isIn(["published", "archived"])
     .withMessage("Status must be published or archived"),
-  body("author")
-    .trim()
-    .notEmpty()
-    .withMessage("Author cannot be empty")
-    .isString()
-    .withMessage("Author must be a string")
-    .isLength({ min: 1, max: 24 })
-    .withMessage("Author must be an alphanumeric of 24 characters")
-    .custom(async (author) => {
-      try {
-        const authorExisting = await UserModel.findOne({
-          $and: [{ _id: author }, { deletedAt: null }],
-        });
-
-        if (!authorExisting) {
-          return Promise.reject("Author not founded");
-        }
-      } catch (err) {
-        console.error("Error checking the existency of the author", err);
-        return Promise.reject("Error checking the existency of the author");
-      }
-    }),
   body("tags")
     .trim()
     .notEmpty()
@@ -158,29 +135,6 @@ export const updateArticleValidations = [
     .withMessage("Status must be a string")
     .isIn(["published", "archived"])
     .withMessage("Status must be published or archived"),
-  body("author")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Author cannot be empty")
-    .isString()
-    .withMessage("Author must be a string")
-    .isLength({ min: 1, max: 24 })
-    .withMessage("Author must be an alphanumeric of 24 characters")
-    .custom(async (author) => {
-      try {
-        const authorExisting = await UserModel.findOne({
-          $and: [{ _id: author }, { deletedAt: null }],
-        });
-
-        if (!authorExisting) {
-          return Promise.reject("Author not founded");
-        }
-      } catch (err) {
-        console.error("Error checking the existency of the author", err);
-        return Promise.reject("Error checking the existency of the author");
-      }
-    }),
   body("tags")
     .optional()
     .trim()
