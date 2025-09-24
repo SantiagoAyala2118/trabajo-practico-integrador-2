@@ -31,5 +31,40 @@ Esta forma de "relacionar" documentos se implementó entre los esquemas de **_Ar
 - Hay riesgos de datos rotos, ya que Mongo no te avisa de errores de referencia.
 - Es más complejo de mantener
 
-
+### **Ejemplos de request/response de los endpoints**
+#### ***_USERS_***
+**POST:**
+El usuario al momento de registrarse en el sistema, enviará una request (consulta) al siguiente endpoint: ***http://localhost:4100/api/users***, un documento tal que así:
+```javascript
+{
+    "username":"santiago",
+    "email":"santiago@gmail.com", 
+    "password":"123123", 
+    "role":"user", 
+    "profile":{
+        "firstName":"Santi",
+        "lastName":"Ayala"
+        "...":"..."  //<----- Resto de información solicitada en el esquema
+    }
+}
+```
+Y el servidor responderá de la siguiente manera:
+```javascript
+{
+    "message": "User created",
+    "User": {
+        "username": "santiago",
+        "email": "santiago@gmail.com",
+        "password": "$2b$10$laUPDgSuG4BnlL/NmECCFOHLqVss.T1..TNVQ3PwWYMxJ2ty8hrUG", //<---- Contraseña hasheada
+        "role": "user",
+        "profile": {
+            "firstName": "Santi",
+            "lastName": "Ayala"
+        },
+        "deletedAt": null, //<----- Campo que dice si el usuario está o no eliminado (en un comienzo siempre null)
+        "_id": "68d449f88c763ae976120ae1",
+        "id": "68d449f88c763ae976120ae1"
+    }
+}
+```
 
