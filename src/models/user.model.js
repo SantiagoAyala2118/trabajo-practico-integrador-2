@@ -59,8 +59,14 @@ const userSchema = new Schema(
   }
 );
 
+userSchema.pre(/^find/, function (next) {
+  this.where({ deletedAt: null });
+
+  next();
+});
+
 //PARA LA ELIMINACIÓN EN CASCADA
-userSchema.post("findByIdAndUpdate", async (doc) => {
+userSchema.pre("findByIdAndUpdate", async (doc) => {
   if (!doc) return;
 
   if (doc.deletedAt !== null) {
