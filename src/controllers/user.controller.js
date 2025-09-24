@@ -5,7 +5,7 @@ import { matchedData } from "express-validator";
 
 export const getAllUsersWithArticles = async (req, res) => {
   try {
-    const users = await UserModel.find({ deletedAt: null }).populate({
+    const users = await UserModel.find().populate({
       path: "articles",
       select: "title status _id",
     });
@@ -34,16 +34,14 @@ export const getAllUsersWithArticles = async (req, res) => {
 export const getUserWithArticlesAndComments = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await UserModel.findOne({ _id: id, deletedAt: null }).populate(
-      {
-        path: "articles",
-        select: "title status _id",
-        populate: {
-          path: "comments",
-          select: "content author",
-        },
-      }
-    );
+    const user = await UserModel.findById(id).populate({
+      path: "articles",
+      select: "title status _id",
+      populate: {
+        path: "comments",
+        select: "content author",
+      },
+    });
 
     return res.status(200).json({
       ok: true,
