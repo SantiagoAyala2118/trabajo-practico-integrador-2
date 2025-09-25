@@ -35,7 +35,7 @@ Esta forma de "relacionar" documentos se implementó entre los esquemas de **_Ar
 #### ***_USERS/AUTH_***
 **MÉTODO POST:**
 - El usuario al momento de registrarse en el sistema, enviará una request (consulta) al siguiente endpoint: ***http://localhost:4100/api/auth/users***, un documento tal que así:
-```javascript
+```json
 {
     "username":"santiago",
     "email":"santiago@gmail.com", 
@@ -49,7 +49,7 @@ Esta forma de "relacionar" documentos se implementó entre los esquemas de **_Ar
 }
 ```
 Y el servidor responderá de la siguiente manera:
-```javascript
+```json
 {
     "message": "User created",
     "User": {
@@ -68,37 +68,37 @@ Y el servidor responderá de la siguiente manera:
 }
 ```
 - Luego del registro, para loguearse el usuario enviará solamente ciertos datos para comparar en la base de datos al siguiente endpoint: ***http://localhost:4100/api/auth/login***
-```javascript
+```json
 {
     "username":"santiago",
     "password":"123123"
 }
 ```
 Al momento de recibir la solicitud, el servidor realiza una comparación donde busca en la BD un usuario con ese nombre, y a su vez una contraseña que al ser hasheada, tenga el mismo resultado. En dado caso de dar con ese usuario, el sistema arrojará el siguiente mensaje:
-```javascript
+```json
 {
-    ok: true,
-    message: "Loggin succesfuly",
+    "ok": true,
+    "message": "Loggin succesfuly",
 }
 
 //caso contrario:
 {
-    ok: false,
-    message: "Username or password incorrect",
+    "ok": false,
+    "message": "Username or password incorrect",
 }
 ```
 - Una vez logueado, el usuario tiene acceso al resto de endpoints del sistema, aunque eso tambien depende de los permisos y roles que maneje. Como el usuario ya está autenticado, ahora tiene acceso al endpoint para desloguearse: ***http://localhost:4100/api/auth/logout***
 Este endpoint solo hace una consulta para borrar la cookie con los datos del usuario, en caso de exito muestra las siguientes respuestas:
-```javascript
+```json
 {
-    ok: true,
-    message: "Logout succesfuly",
+    "ok": true,
+    "message": "Logout succesfuly",
 }
 ``` 
 - Para traer o actualizar el perfil del usuario logueado se utilizan los mismos endpoints: ***http://localhost:4100/api/auth/profile***
 En el caso de traer el perfil se utiliza el **MÉTODO GET** y solo se evalúa el id del usuario logueado.
 Por el otro lado, para actualizar el perfil se utiliza el **MÉTODO PUT** y se reciben los siguientes valores:
-```javascript
+```json
 {
     "profile": {
     "firstName": "Santiago",
@@ -110,14 +110,14 @@ Por el otro lado, para actualizar el perfil se utiliza el **MÉTODO PUT** y se r
 }
 ```
 En caso de enviar datos válidos y que no salten las validaciones, el servidor enviará un mensaje como:
-```javascript
+```json
 {
-    ok: true,
-    message: "Profile updated",
+    "ok": true,
+    "message": "Profile updated",
 }
 ```
 - A su vez, hay otros endpoints que permiten otras interacciones con los usuario, como ser: ***http://localhost:4100/api/users***. Este utiliza el **MÉTODO GET** y lo único que hace es listar los usuarios con sus articulos, arrojando una respuesta tal que así:
-```javascript
+```json
 {
     {
     "username":"Santiago"
@@ -136,7 +136,7 @@ En caso de enviar datos válidos y que no salten las validaciones, el servidor e
 }
 ```
 - El siguiente endpoint también utiliza el **MÉTODO GET**, sin embargo éste recibe un id por el parámetro, tal que así: ***http://localhost:4100/api/users/:id***. Este trae un solo usuario, con la diferencia de que además, este incluye los comentarios ligados, además del artículo, dando una respuesta como la siguiente:
-```javascript
+```json
 {
     {
     "username":"Santiago"
@@ -159,7 +159,7 @@ En caso de enviar datos válidos y que no salten las validaciones, el servidor e
 
 - Los siguientes endpoints utilizan todos el mismo modelo que el anterior, recibiendo un id por parámetros. No obstante, estos realizan acciones diferentes:
 Uno utiliza el **METODO PUT** para actualizar un usuario, esperando una request tal que así:
-```javascript
+```json
 {
     {
         "username":"Tomás" //<--- Se cambió el nombre
@@ -181,32 +181,32 @@ Uno utiliza el **METODO PUT** para actualizar un usuario, esperando una request 
 ```
 > En este sistema y caso, el usuario puede cambiar cualquier campo que quiera (y tampoco es necesario mandar todos los campos, es posible  mandar solo los deseados), siempre y cuando cumpla con las validaciones. 
 Y enviará una respuesta parecida a la siguiente: 
-```javascript
-{   ok: true,
-    message: "User updated",
-    user: updateUser, //<--- Se envía el usuario actualizado
+```json
+{   "ok": true,
+    "message": "User updated",
+    "user": updateUser, //<--- Se envía el usuario actualizado
 }
 ```
 - Luego está el endpoint para borrar que utiliza el **MÉTODO DELETE** y lo único que hace una vez recibe el id por el parámetro, como se ve a continuación: _http://localhost:4100/api/users/60b4a85f3b2e4c0f7d8a9b1c_ es preguntar si existe algun documento en la base de datos con ese id que no esté ya borrado (recordando que los usuarios son de eliminación lóigica). 
 > Cabe recalcar que este modelo de consulta a través de los parámetros es el mismo para todos los endpoints que requiean un id, Lo único que cambiaría sería el parámetro "users" por el que se esté haciendo referencia en ese momento, por ejemplo "articles".
 Una vez haya encontrado un usuario con ese id, mandará la siguiente respuesta: 
-```javascript
+```json
 {
-    ok: true,
-    message: "User deleted",
+    "ok": true,
+    "message": "User deleted",
 }
 ```
 Caso contrario (para la mayoría de bpusquedas que no den con el id):
-```javascript
+```json
 {
-    ok:false,
-    message:"User not found",
+    "ok": false,
+    "message":"User not found",
 }
 ```
 #### ***_ARTICLES_***
 Para este modelo se implementó un _CRUD_ completo, más otros pequeños detalles correspondientes a la autorización de los usuarios.
 - El primer endpoint, como el de todos, utiliza el **MÉTODO POST** y se envía una solicitud a _http://localhost:4100/api/articles_ con el siguiente formato: 
-```javascript
+```json
 {
     "title": "ACCIDENTE EN LA RUTA NACIONAL N°2",
     "content": "Un siniestro se produjo en la Ruta Nacional N°2 rondnado las 4 de la madrugada...",
@@ -218,15 +218,15 @@ Para este modelo se implementó un _CRUD_ completo, más otros pequeños detalle
 ```
 
 Y enviará una respuesta tal como:
-```javascript
+```json
 {
-    ok: true,
-    message: "Article created",
-    Article: article,
+    "ok": true,
+    "message": "Article created",
+    "Article": article,
 }
 ```
 - El siguiente endpoint es exactamente igual al anterior, solo que este utiliza el **MÉTODO GET** para listar todos los artículos presentes en la base de datos. Y arroja una respuesta más o menos como esta:
-```javascript
+```json
 {
     "title": "ACCIDENTE EN LA RUTA NACIONAL N°2",
     "content": "Un siniestro se produjo en la Ruta Nacional N°2 rondnado las 4 de la madrugada...",
@@ -260,7 +260,7 @@ Y enviará una respuesta tal como:
 - Luego están los endpoints que reciben por parámetros los id's de los artículos, y son todos iguales entre sí, siguiendo este formato: _http://localhost:4100/api/articles/:id_. Lo único que cada uno utiliza un método diferente.
 - Está el que usa el **MÉTODO GET** que trae solamente el artículo especificado.
 - Está el que usa el **MÉTODO PUT** que actualiza el artículo específicado, esperando una petición como la siguiente: 
-```javascript
+```json
 {
     "title": "ACCIDENTE EN LA RUTA NACIONAL N°2",
     "content": "Un siniestro se produjo en la Ruta Nacional N°2 rondnado las 4 de la madrugada...",
@@ -270,11 +270,11 @@ Y enviará una respuesta tal como:
 },
 ```  
 Y enviará una respuesta como la siguiente en caso de que haya salido todo bien:
-```javascript
+```jjson
 {   
-    ok: true,
-    message: "Article updated",
-    Article: updatedArticle,
+    "ok": true,
+    "message": "Article updated",
+    "Article": updatedArticle,
 }
 ```
 - Está el que usa el **MÉTODO DELETE** que elimina un articulo dependiendo del id enviado por parámetro.
@@ -282,25 +282,25 @@ Y enviará una respuesta como la siguiente en caso de que haya salido todo bien:
 ### ***_TAGS_***
 - En este caso también se optó por un _CRUD_ completo, contando con los 4 endpoints básicos:
 - El que utiliza el **MÉTODO POST**: _http://localhost:4100/api/tags_, el cual espera una request tal que así:
-```javascript
+```json
 {
     "name":"Deportes",
     "description":"El artículo hace referencia o menciona a cualquier deporte"
 }
 ```
 Y arroja una respuesta como la siguiente:
-```javascript
+```json
 {
-    ok: true,
-    message: "Tag created",
-    Tag: tag,
+    "ok": true,
+    "message": "Tag created",
+    "Tag": tag,
 }
 ```
 -Está el **MÉTODO GET**, el cuál usa el endpoint anterior y lo único que hace es mostrar un listado de todas las etiquetas existentes hasta el momento:
-```javascript
-      ok: true,
-      message: "Tags founded",
-      Tags: [
+```json
+      "ok": true,
+      "message": "Tags founded",
+      "Tags": [
         {
             "name":"Deportes",
             "description":"El artículo hace referencia o menciona a cualquier deporte"
@@ -318,33 +318,33 @@ También está el otro que utiliza el mismo método pero recibe un id por parám
 > Este endpoint ya no trae un arreglo de tags, sino un solo objeto.
 
 - Está el endpoint que usa el **MÉTODO PUT** que también recibe un id por parámetros se encarga de actualizar la etiqueta solicitada. Esta ruta espera una consulta parecida a la del **MÉTODO POST**:
-```javascript
+```json
 {
     "name":"Juegos",
     "description":"El artículo trata sobre juegos de cualquier tipo"
 }
 ```
 Enviando una respuesta como la siguiente en caso de ningún inconveniente: 
-```javascript
+```json
 {
-    ok: true,
-    message: "Tag updated",
-    Tag: updateTag,
+    "ok": true,
+    "message": "Tag updated",
+    "Tag": updateTag,
 }
 ```
 - Está por ultimo el **MÉTODO DELETE** el cuál se encarga de eliminar el artículo recibido por el id en los parámetro de la consulta. Y este arroja un mensaje como el que se muestra, una vez que el artículo haya sido borrado efectivamente:
-```javascript
+```json
 {
-    ok: true,
-    message: "Tag deleted",
-    Tag: deleteTag,
+    "ok": true,
+    "message": "Tag deleted",
+    "Tag": deleteTag,
 }
 ```
 
 ### ***_COMMENTS_***
 Para el modelo de comentarios se utilizó de igual forma un _CRUD_ completo sin nada raro. Por lo que se cuenta con los 4 endpoints básicos.
 - Como en los modelos anteriores, se encuentra el **MÉTODO POST**: _http://localhost:4100/api/comments_ el cual espera una petición algo así:
-```javascript
+```json
 {
     "content": "Muy bueno tu artículo",
     "author": "60b4a85f3b2e4c0f7d8a9b1c", //<--- usuario que hizo el comentario
@@ -352,11 +352,11 @@ Para el modelo de comentarios se utilizó de igual forma un _CRUD_ completo sin 
   },
 ```
 Una vez que todo salga bien, se envía una respuesta tal que:
-```javascript
+```json
 {
-    ok: true,
-    message: "Comment created",
-    comment: newComment,
+    "ok": true,
+    "message": "Comment created",
+    "comment": newComment,
 }
 ```
 > Cabe recalcar en este punto, que en el campo que referencia al modelo creado (en este caso comment) se está pasando la forma en la que se ve el modelo creado, que e practicamente lo mismo que cuando le pasas los valores, po lo que no se cree necesario mostrarlo (a no ser que sea realmente necesario).
@@ -372,19 +372,19 @@ Una vez que todo salga bien, se envía una respuesta tal que:
 },
 ```
 Y envía un response como este:
-```javascript
+```json
 {
-    ok: true,
-    message: "Comment updated",
-    Comment: updatedComment,
+    "ok": true,
+    "message": "Comment updated",
+    "Comment": updatedComment,
 }
 ```
 -Continuando con el **MÉTODO DELETE**, como ya vimos, este es el responsable de eliminar el documento,que en este caso es el comentario. Recibe un id por parámetro y arroja una respuesta como la siguiente en caso de que todo haya ido bien:
-```javascript
+```json
 {
-    ok: true,
-    message: "Comment deleted",
-    Comment: deletedComment,
+    "ok": true,
+    "message": "Comment deleted",
+    "Comment": deletedComment,
 }
 ```
 ### ***_ARTICLE_TAG_***
@@ -395,18 +395,18 @@ Y envía un response como este:
 Esto nos daría una respuesta como la siguiente:
 ```json
 {
-    ok: true,
-    message: "Tag added to article succesfuly",
-    Article: newArticleTag,
+    "ok": true,
+    "message": "Tag added to article succesfuly",
+    "Article": newArticleTag,
 }
 ```
 > Lo que sucede detrás es que a un artículo con el id pasado por parámetros, se le está asignando una nueva etiqueta en el arreglo que las referencia.
 - Por último, está el endpoint que utiliza el **MÉTODO DELETE**. Éste es el encargado de remover las etiquetas de los articulos y requiere los mismos parámetros que el endpoint anterior. Y devuelve una respuesta como esta:
 ```json
 {
-    ok: true,
-    message: "Tag succesfuly removed from de article",
-    ArticleTag: deleteArticleTag,
+    "ok": true,
+    "message": "Tag succesfuly removed from de article",
+    "ArticleTag": deleteArticleTag,
 }
 ```
 > Del mismo modo, lo que sucede por detrás es que a un artículo, se le está quitando, borrando, extrayendo, etc. una etiqueta del arreglo que las referencia.
