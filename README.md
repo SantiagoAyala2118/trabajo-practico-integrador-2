@@ -214,7 +214,7 @@ Para este modelo se implementó un _CRUD_ completo, más otros pequeños detalle
     "status": "published",
     "author": "60b4a85f3b2e4c0f7d8a9b1c",//<--- id del usuario que lo creó
     "tags": ["60b4a84h3b2e4c05ud8a9b1g"], //<--- arreglo donde van los id's que refrencian a las etiquetas
-  },
+},
 ```
 
 Y enviará una respuesta tal como:
@@ -225,3 +225,188 @@ Y enviará una respuesta tal como:
     Article: article,
 }
 ```
+- El siguiente endpoint es exactamente igual al anterior, solo que este utiliza el **MÉTODO GET** para listar todos los artículos presentes en la base de datos. Y arroja una respuesta más o menos como esta:
+```javascript
+{
+    "title": "ACCIDENTE EN LA RUTA NACIONAL N°2",
+    "content": "Un siniestro se produjo en la Ruta Nacional N°2 rondnado las 4 de la madrugada...",
+    "excerpt": "Un camión que transportaba leña embistió a...",
+    "status": "published",
+    "author":{
+        "_id":"60b4a85f3b2e4c0f7d8a9b1c",
+        "username":"Santiago"
+        "email": "satiago@gmail.com",
+        "role": "user",
+        "profile": {
+            "firstName": "Santiago",
+            "lastName": "Ayala",
+            "biography": "Un estudidante de la Tecnicatura Superior en Desarrollo de Software Multiplataforma", 
+            "avatarUrl":"https://avatar_url",
+            "birthDate":"21/01/07"
+        },
+        "deletedAt": null,
+    }
+    "tags": [
+        {
+            "_id":"60b4a84h3b2e4c05ud8a9b1g",
+            "name":"Urgente",
+            "description":"Es algo demasiado importante"
+        }
+    ] 
+},
+```
+> Como se aprecia, en esta consulta trae todos los campos tanto del usuario (author) como de las etiquetas (tags).
+- El siguiente endpoint se diferencia del resto principalmente en su forma de finalizar, ya que no recibe por parámetros ningún id ni nada: _http://localhost:4100/api/articles/my_. Y este lo que hace es consultar a la base de datos algún articulo que coincida con el id del usuario logueado. Arrojando una respuesta igual a la anterior, con la unica diferencia de que este trae solo los asociados con el usuario logueado.
+- Luego están los endpoints que reciben por parámetros los id's de los artículos, y son todos iguales entre sí, siguiendo este formato: _http://localhost:4100/api/articles/:id_. Lo único que cada uno utiliza un método diferente.
+- Está el que usa el **MÉTODO GET** que trae solamente el artículo especificado.
+- Está el que usa el **MÉTODO PUT** que actualiza el artículo específicado, esperando una petición como la siguiente: 
+```javascript
+{
+    "title": "ACCIDENTE EN LA RUTA NACIONAL N°2",
+    "content": "Un siniestro se produjo en la Ruta Nacional N°2 rondnado las 4 de la madrugada...",
+    "excerpt": "Un camión que transportaba leña embistió a...",
+    "status": "archived", //<--- pasó de estar publicado a archivado
+    "tags": ["60b4a84h3b2e4c05ud8a9b1g"],
+},
+```  
+Y enviará una respuesta como la siguiente en caso de que haya salido todo bien:
+```javascript
+{   
+    ok: true,
+    message: "Article updated",
+    Article: updatedArticle,
+}
+```
+- Está el que usa el **MÉTODO DELETE** que elimina un articulo dependiendo del id enviado por parámetro.
+
+### ***_TAGS_***
+- En este caso también se optó por un _CRUD_ completo, contando con los 4 endpoints básicos:
+- El que utiliza el **MÉTODO POST**: _http://localhost:4100/api/tags_, el cual espera una request tal que así:
+```javascript
+{
+    "name":"Deportes",
+    "description":"El artículo hace referencia o menciona a cualquier deporte"
+}
+```
+Y arroja una respuesta como la siguiente:
+```javascript
+{
+    ok: true,
+    message: "Tag created",
+    Tag: tag,
+}
+```
+-Está el **MÉTODO GET**, el cuál usa el endpoint anterior y lo único que hace es mostrar un listado de todas las etiquetas existentes hasta el momento:
+```javascript
+      ok: true,
+      message: "Tags founded",
+      Tags: [
+        {
+            "name":"Deportes",
+            "description":"El artículo hace referencia o menciona a cualquier deporte"
+        },
+        {
+            "name":"Anime",
+            "description":"El artículo habla o menciona a series de anime"
+        },
+        {
+            "...":"..."
+        }
+      ],
+```
+También está el otro que utiliza el mismo método pero recibe un id por parámetros, trayendo solo el artículo solicitado.
+> Este endpoint ya no trae un arreglo de tags, sino un solo objeto.
+
+- Está el endpoint que usa el **MÉTODO PUT** que también recibe un id por parámetros se encarga de actualizar la etiqueta solicitada. Esta ruta espera una consulta parecida a la del **MÉTODO POST**:
+```javascript
+{
+    "name":"Juegos",
+    "description":"El artículo trata sobre juegos de cualquier tipo"
+}
+```
+Enviando una respuesta como la siguiente en caso de ningún inconveniente: 
+```javascript
+{
+    ok: true,
+    message: "Tag updated",
+    Tag: updateTag,
+}
+```
+- Está por ultimo el **MÉTODO DELETE** el cuál se encarga de eliminar el artículo recibido por el id en los parámetro de la consulta. Y este arroja un mensaje como el que se muestra, una vez que el artículo haya sido borrado efectivamente:
+```javascript
+{
+    ok: true,
+    message: "Tag deleted",
+    Tag: deleteTag,
+}
+```
+
+### ***_COMMENTS_***
+Para el modelo de comentarios se utilizó de igual forma un _CRUD_ completo sin nada raro. Por lo que se cuenta con los 4 endpoints básicos.
+- Como en los modelos anteriores, se encuentra el **MÉTODO POST**: _http://localhost:4100/api/comments_ el cual espera una petición algo así:
+```javascript
+{
+    "content": "Muy bueno tu artículo",
+    "author": "60b4a85f3b2e4c0f7d8a9b1c", //<--- usuario que hizo el comentario
+    "article": "6er4a85f3b2e4c0f7d4h2j3f", //<--- artículo al que se refiere
+  },
+```
+Una vez que todo salga bien, se envía una respuesta tal que:
+```javascript
+{
+    ok: true,
+    message: "Comment created",
+    comment: newComment,
+}
+```
+> Cabe recalcar en este punto, que en el campo que referencia al modelo creado (en este caso comment) se está pasando la forma en la que se ve el modelo creado, que e practicamente lo mismo que cuando le pasas los valores, po lo que no se cree necesario mostrarlo (a no ser que sea realmente necesario).
+
+- También está el endpoint que utiliza el **MÉTODO GET**, y este método lo comparten los endpoints que traen tanto el listado de los comentarios como un solo comentario ligado al usuario logueado. La respuesta que esperan es bastante similar, tanto entre sí como con la anterior mostrada, por lo que no se considera necesario mostrar el response por parte del servidor.
+
+- El **MÉTODO PUT** es el que se utiliza para actualizar un comentario, nuevamente recibe un id por parámetro y espera la siguiente entrada:
+```javascript
+{
+    "content": "Muy malo tu artículo", //<--- se cambió el contenido del comentario
+    "author": "60b4a85f3b2e4c0f7d8a9b1c", 
+    "article": "6er4a85f3b2e4c0f7d4h2j3f", 
+},
+```
+Y envía un response como este:
+```javascript
+{
+    ok: true,
+    message: "Comment updated",
+    Comment: updatedComment,
+}
+```
+-Continuando con el **MÉTODO DELETE**, como ya vimos, este es el responsable de eliminar el documento,que en este caso es el comentario. Recibe un id por parámetro y arroja una respuesta como la siguiente en caso de que todo haya ido bien:
+```javascript
+{
+    ok: true,
+    message: "Comment deleted",
+    Comment: deletedComment,
+}
+```
+### ***_ARTICLE_TAG_***
+- Por último tenemos el los endpoints que representan la relación de muchos a muchos en nuestro sistema. Este grupo consta de dos endpoints con la misma estructura pero con métodos diferentes: _http://localhost:4100/api/articles/:articleId/tags/:tagId_
+
+- En primer lugar tenemos al **MÉTODO POST** que consiste en crear un tipo de relación entre un artículo y una etiqueta. Esto mandando el id de ambios dentro de los parámetros de la ruta. Por ejemplo: _http://localhost:4100/api/articles/6er4a85f3b2e4c0f7d4h2j3f/tags/60b4a84h3b2e4c05ud8a9b1g_
+> En este caso, al enviar toda la info requerida por los parámetros, no es necesario enviar nada por el body.
+Esto nos daría una respuesta como la siguiente:
+```json
+{
+    ok: true,
+    message: "Tag added to article succesfuly",
+    Article: newArticleTag,
+}
+```
+> Lo que sucede detrás es que a un artículo con el id pasado por parámetros, se le está asignando una nueva etiqueta en el arreglo que las referencia.
+- Por último, está el endpoint que utiliza el **MÉTODO DELETE**. Éste es el encargado de remover las etiquetas de los articulos y requiere los mismos parámetros que el endpoint anterior. Y devuelve una respuesta como esta:
+```json
+{
+    ok: true,
+    message: "Tag succesfuly removed from de article",
+    ArticleTag: deleteArticleTag,
+}
+```
+> Del mismo modo, lo que sucede por detrás es que a un artículo, se le está quitando, borrando, extrayendo, etc. una etiqueta del arreglo que las referencia.
