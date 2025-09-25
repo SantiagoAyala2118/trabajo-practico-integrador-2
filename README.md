@@ -32,9 +32,9 @@ Esta forma de "relacionar" documentos se implementó entre los esquemas de **_Ar
 - Es más complejo de mantener
 
 ### **Ejemplos de request/response de los endpoints**
-#### ***_USERS_***
-**POST:**
-El usuario al momento de registrarse en el sistema, enviará una request (consulta) al siguiente endpoint: ***http://localhost:4100/api/users***, un documento tal que así:
+#### ***_USERS/AUTH_***
+**MÉTODO POST:**
+- El usuario al momento de registrarse en el sistema, enviará una request (consulta) al siguiente endpoint: ***http://localhost:4100/api/auth/users***, un documento tal que así:
 ```javascript
 {
     "username":"santiago",
@@ -67,4 +67,161 @@ Y el servidor responderá de la siguiente manera:
     }
 }
 ```
+- Luego del registro, para loguearse el usuario enviará solamente ciertos datos para comparar en la base de datos al siguiente endpoint: ***http://localhost:4100/api/auth/login***
+```javascript
+{
+    "username":"santiago",
+    "password":"123123"
+}
+```
+Al momento de recibir la solicitud, el servidor realiza una comparación donde busca en la BD un usuario con ese nombre, y a su vez una contraseña que al ser hasheada, tenga el mismo resultado. En dado caso de dar con ese usuario, el sistema arrojará el siguiente mensaje:
+```javascript
+{
+    ok: true,
+    message: "Loggin succesfuly",
+}
 
+//caso contrario:
+{
+    ok: false,
+    message: "Username or password incorrect",
+}
+```
+- Una vez logueado, el usuario tiene acceso al resto de endpoints del sistema, aunque eso tambien depende de los permisos y roles que maneje. Como el usuario ya está autenticado, ahora tiene acceso al endpoint para desloguearse: ***http://localhost:4100/api/auth/logout***
+Este endpoint solo hace una consulta para borrar la cookie con los datos del usuario, en caso de exito muestra las siguientes respuestas:
+```javascript
+{
+    ok: true,
+    message: "Logout succesfuly",
+}
+``` 
+- Para traer o actualizar el perfil del usuario logueado se utilizan los mismos endpoints: ***http://localhost:4100/api/auth/profile***
+En el caso de traer el perfil se utiliza el **MÉTODO GET** y solo se evalúa el id del usuario logueado.
+Por el otro lado, para actualizar el perfil se utiliza el **MÉTODO PUT** y se reciben los siguientes valores:
+```javascript
+{
+    "profile": {
+    "firstName": "Santiago",
+    "lastName": "Ayala",
+    "biography": "Un estudidante de la Tecnicatura Superior en Desarrollo de Software Multiplataforma", 
+    "avatarUrl":"https://avatar_url",
+    "birthDate":"21/01/07"
+    }
+}
+```
+En caso de enviar datos válidos y que no salten las validaciones, el servidor enviará un mensaje como:
+```javascript
+{
+    ok: true,
+    message: "Profile updated",
+}
+```
+- A su vez, hay otros endpoints que permiten otras interacciones con los usuario, como ser: ***http://localhost:4100/api/users***. Este utiliza el **MÉTODO GET** y lo único que hace es listar los usuarios con sus articulos, arrojando una respuesta tal que así:
+```javascript
+{
+    {
+    "username":"Santiago"
+    "email": "satiago@gmail.com",
+    "role": "user",
+    "profile": {
+      "firstName": "Santiago",
+      "lastName": "Ayala",
+      "biography": "Un estudidante de la Tecnicatura Superior en Desarrollo de Software Multiplataforma", 
+      "avatarUrl":"https://avatar_url",
+      "birthDate":"21/01/07"
+    },
+    "deletedAt": null,
+    "articles":["_id 1","_id 2"...]//<--- Los articulos que pertenecen a ese usuario
+  },
+}
+```
+- El siguiente endpoint también utiliza el **MÉTODO GET**, sin embargo éste recibe un id por el parámetro, tal que así: ***http://localhost:4100/api/users/:id***. Este trae un solo usuario, con la diferencia de que además, este incluye los comentarios ligados, además del artículo, dando una respuesta como la siguiente:
+```javascript
+{
+    {
+    "username":"Santiago"
+    "email": "satiago@gmail.com",
+    "role": "user",
+    "profile": {
+      "firstName": "Santiago",
+      "lastName": "Ayala",
+      "biography": "Un estudidante de la Tecnicatura Superior en Desarrollo de Software Multiplataforma", 
+      "avatarUrl":"https://avatar_url",
+      "birthDate":"21/01/07"
+    },
+    "deletedAt": null,
+    "articles":["_id 1","_id 2"...], //<--- Los articulos que pertenecen a ese usuario
+    "comments":["_id 1","_id 2"...], //<--- Los commentarios que pertenecen a ese usuario
+  },
+}
+```
+> Cabe recalcar que estos campos, al no estar ligados al usuario o pertenecer a un campo en específico, es necesario emplear el VIRTUAL para lograr hacer un "populate inverso" y traer esos campos.
+
+- Los siguientes endpoints utilizan todos el mismo modelo que el anterior, recibiendo un id por parámetros. No obstante, estos realizan acciones diferentes:
+Uno utiliza el **METODO PUT** para actualizar un usuario, esperando una request tal que así:
+```javascript
+{
+    {
+        "username":"Tomás" //<--- Se cambió el nombre
+        "email": "satiago@gmail.com",
+        "password":"123123"
+        "role": "user",
+        "profile": {
+            "firstName": "Santiago",
+            "lastName": "Ayala",
+            "biography": "Un estudidante de la Tecnicatura Superior en Desarrollo de Software Multiplataforma", 
+            "avatarUrl":"https://avatar_url",
+            "birthDate":"21/01/07"
+        },
+        "deletedAt": null,
+        "articles":["_id 1","_id 2"...], //<--- Los articulos que pertenecen a ese usuario
+        "comments":["_id 1","_id 2"...], //<--- Los commentarios que pertenecen a ese usuario
+    }
+},
+```
+> En este sistema y caso, el usuario puede cambiar cualquier campo que quiera (y tampoco es necesario mandar todos los campos, es posible  mandar solo los deseados), siempre y cuando cumpla con las validaciones. 
+Y enviará una respuesta parecida a la siguiente: 
+```javascript
+{   ok: true,
+    message: "User updated",
+    user: updateUser, //<--- Se envía el usuario actualizado
+}
+```
+- Luego está el endpoint para borrar que utiliza el **MÉTODO DELETE** y lo único que hace una vez recibe el id por el parámetro, como se ve a continuación: _http://localhost:4100/api/users/60b4a85f3b2e4c0f7d8a9b1c_ es preguntar si existe algun documento en la base de datos con ese id que no esté ya borrado (recordando que los usuarios son de eliminación lóigica). 
+> Cabe recalcar que este modelo de consulta a través de los parámetros es el mismo para todos los endpoints que requiean un id, Lo único que cambiaría sería el parámetro "users" por el que se esté haciendo referencia en ese momento, por ejemplo "articles".
+Una vez haya encontrado un usuario con ese id, mandará la siguiente respuesta: 
+```javascript
+{
+    ok: true,
+    message: "User deleted",
+}
+```
+Caso contrario (para la mayoría de bpusquedas que no den con el id):
+```javascript
+{
+    ok:false,
+    message:"User not found",
+}
+```
+#### ***_ARTICLES_***
+Para este modelo se implementó un _CRUD_ completo, más otros pequeños detalles correspondientes a la autorización de los usuarios.
+- El primer endpoint, como el de todos, utiliza el **MÉTODO POST** y se envía una solicitud a _http://localhost:4100/api/articles_ con el siguiente formato: 
+```javascript
+{
+    "title": "ACCIDENTE EN LA RUTA NACIONAL N°2",
+    "content": "Un siniestro se produjo en la Ruta Nacional N°2 rondnado las 4 de la madrugada...",
+    "excerpt": "Un camión que transportaba leña embistió a...",
+    "status": "published",
+    "author": "60b4a85f3b2e4c0f7d8a9b1c",//<--- id del usuario que lo creó
+    "tags": ["60b4a84h3b2e4c05ud8a9b1g"], //<--- arreglo donde van los id's que refrencian a las etiquetas
+  },
+```
+
+Y enviará una respuesta tal como:
+```javascript
+{
+    ok: true,
+    message: "Article created",
+    Article: article,
+}
+```
