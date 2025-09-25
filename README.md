@@ -410,3 +410,9 @@ Esto nos daría una respuesta como la siguiente:
 }
 ```
 > Del mismo modo, lo que sucede por detrás es que a un artículo, se le está quitando, borrando, extrayendo, etc. una etiqueta del arreglo que las referencia.
+
+### **Validaciones custom implementadas**
+- Para este punto, se mencionarán las validaciones de tipo custom qué se han hecho con _express-validator_, que en su mayoría se encargan de verificar la existencia de los usuarios, articulos, tags, etc.
+
+***_USER_***
+- Al momento de registrarse un usuario en el endpoint _http://localhost:4100/api/auth/register_ las dos primeras validaciones custom qué se usan son para verificar la unicidad del username y del email, como se ve a continuación:
